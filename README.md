@@ -33,7 +33,7 @@ Originalmente concebido como um módulo de teste para um sistema de gestão de e
 1. Certifique-se de ter o Python instalado em sua máquina.
 2. Clone o repositório:
    ```bash
-   git clone https://github.com
+   git clone https://github.com/Jeffl33t/sistema-cadastro-python
    ```
 3. Acesse a pasta do projeto e execute:
    ```bash
