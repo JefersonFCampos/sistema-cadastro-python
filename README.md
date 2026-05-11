@@ -13,7 +13,7 @@ Originalmente concebido como um módulo de teste para um sistema de gestão de e
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Linguagem:** Python 3.x
+- **Linguagem:** Python 3.14.5
 - **Interface:** Tkinter (GUI)
 - **Banco de Dados:** SQLite3
 - **Regex:** Biblioteca `re` para validação de padrões de strings.
@@ -33,7 +33,7 @@ Originalmente concebido como um módulo de teste para um sistema de gestão de e
 1. Certifique-se de ter o Python instalado em sua máquina.
 2. Clone o repositório:
    ```bash
-   git clone https://github.com/Jeffl33t/sistema-cadastro-python
+   git clone https://github.com/JefersonFCampos/sistema-cadastro-python
    ```
 3. Acesse a pasta do projeto e execute:
    ```bash

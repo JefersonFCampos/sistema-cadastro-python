@@ -59,7 +59,7 @@ def salvar_database():
     check_email = sincronizar_campo(entrada_email, email_erro, validar_email)
 
     # Se todos os checks retornarem True, prossegue com o salvamento
-    if all([check_nome, check_ddd, check_fone, check_email]):
+    if all([check_nome, check_ddd, check_telefone, check_email]):
         # Coleta os dados finais para envio ao SQLite
         nome = entrada_nome.get().strip()
         ddd = entrada_ddd.get().strip()

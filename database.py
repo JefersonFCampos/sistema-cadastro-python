@@ -17,7 +17,7 @@ caminho_db = os.path.join(pasta_data, "cadastro.db")
 
 # --- Operações de Banco de Dados ---
 
-def conexao_database(nome, ddd, fone, email):
+def conexao_database(nome, ddd, telefone, email):
     """
     Estabelece conexão com o SQLite, garante a existência da tabela e realiza a inserção.
     
@@ -45,7 +45,7 @@ def conexao_database(nome, ddd, fone, email):
     cursor.execute(""" 
         INSERT INTO tb_pessoas (T_NOME, T_DDD, T_TELEFONE, T_EMAIL) 
         VALUES (?, ?, ?, ?) 
-    """, (nome, ddd, fone, email))
+    """, (nome, ddd, telefone, email))
 
     # Confirma a transação e encerra a conexão para liberar o arquivo
     conn.commit()
