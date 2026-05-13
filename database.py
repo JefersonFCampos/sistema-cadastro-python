@@ -17,35 +17,27 @@ caminho_db = os.path.join(pasta_data, "cadastro.db")
 
 # --- Operações de Banco de Dados ---
 
-def conexao_database(nome, ddd, telefone, email):
-    """
-    Estabelece conexão com o SQLite, garante a existência da tabela e realiza a inserção.
-    
-    :param nome: String contendo o nome do usuário.
-    :param ddd: String contendo o DDD (2 dígitos).
-    :param fone: String contendo o telefone (9 dígitos).
-    :param email: String contendo o e-mail validado.
-    """
+def conexao_database(nome, email, senha, cargo):
     # Abre a conexão com o arquivo de banco de dados
     conn = sqlite3.connect(caminho_db)
     cursor = conn.cursor()
 
     # DDL (Data Definition Language): Garante que a tabela exista antes da inserção
     cursor.execute(""" 
-        CREATE TABLE IF NOT EXISTS tb_pessoas (
+        CREATE TABLE IF NOT EXISTS tb_usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            T_NOME TEXT (30),
-            T_DDD TEXT (2),
-            T_TELEFONE TEXT (14),
-            T_EMAIL TEXT (30)
+            V_NOME VARCHAR (30),
+            V_EMAIL VARCHAR (30),
+            V_SENHA VARCHAR (30),
+            C_CARGO CHAR (01)
         ) 
     """)
 
     # DML (Data Manipulation Language): Insere os dados validados no banco
     cursor.execute(""" 
-        INSERT INTO tb_pessoas (T_NOME, T_DDD, T_TELEFONE, T_EMAIL) 
+        INSERT INTO tb_usuarios (V_NOME, V_EMAIL, V_SENHA, C_CARGO)
         VALUES (?, ?, ?, ?) 
-    """, (nome, ddd, telefone, email))
+    """, (nome, email, senha, cargo))
 
     # Confirma a transação e encerra a conexão para liberar o arquivo
     conn.commit()
