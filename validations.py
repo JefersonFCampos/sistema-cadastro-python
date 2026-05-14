@@ -52,6 +52,7 @@ def validar_nome(nome_digitado):
             return False, mensagem
     return True, ""
 
+
 def validar_telefone(telefone_digitado):
     """Valida o telefone completo removendo a máscara visual antes do teste."""
     # Remove os parênteses, hifens e espaços para validar apenas os 11 números puros
@@ -78,7 +79,6 @@ def validar_telefone(telefone_digitado):
     return True, ""
 
 
-
 def validar_email(email_digitado):
     """Valida o e-mail utilizando uma lista de regras."""
     conteudo_limpo = email_digitado.strip()
@@ -91,7 +91,7 @@ def validar_email(email_digitado):
             len(conteudo_limpo) > EMAIL_MAX_CARACTERES, f"O e-mail deve ter no máximo {EMAIL_MAX_CARACTERES} caracteres."
         ),
         (
-            not re.match(pattern, conteudo_limpo), "E-mail inválido. Use formatos como: abc@gmail.com ou abc@empresa.com.br"
+            not re.match(pattern, conteudo_limpo), "E-mail inválido. Ex: abc@gmail.com"
         )
     ]
 
