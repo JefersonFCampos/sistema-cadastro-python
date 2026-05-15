@@ -42,6 +42,7 @@ def conexao_database(nome, email, telefone, senha_pura, cargo):
                 V_EMAIL VARCHAR (30) UNIQUE,
                 C_TELEFONE CHAR (11),
                 V_SENHA VARCHAR (64),
+                V_SAL VARCHAR (16),
                 C_CARGO CHAR (01)
             ) 
         """)
@@ -49,10 +50,10 @@ def conexao_database(nome, email, telefone, senha_pura, cargo):
         # Insere os dados validados no banco
         cursor.execute(
             """ 
-            INSERT INTO tb_usuarios (V_NOME, V_EMAIL, C_TELEFONE, V_SENHA, C_CARGO)
-            VALUES (?, ?, ?, ?, ?) 
+            INSERT INTO tb_usuarios (V_NOME, V_EMAIL, C_TELEFONE, V_SENHA, V_SAL, C_CARGO)
+            VALUES (?, ?, ?, ?, ?, ?) 
             """,
-            (nome, email, telefone, senha_criptografada, cargo)
+            (nome, email, telefone, senha_criptografada, senha_tempero, cargo)
         )
 
         conn.commit()
@@ -67,3 +68,36 @@ def conexao_database(nome, email, telefone, senha_pura, cargo):
     finally:
         if conn:
             conn.close()
+
+
+
+def confirmar_acesso(email_digitado, senha_digitada):
+
+    conn = sqlite3.connect(caminho_db)
+    cursor = conn.cursor()
+
+    cursor.execute(
+                    """
+                    SELECT V_EMAIL, V_SENHA, V_SAL, C_CARGO
+                    FROM tb_usuarios
+                    WHERE V_EMAIL = ? 
+                    
+                    """,
+                    (email_digitado,)
+    )
+
+    resultado = cursor.fetchone()
+
+    if resultado is None:
+        conn.close()
+        return False, "Usuário não encontrado!", None
+
+    verificar_senha = senha_digitada + resultado[2] + PIMENTA_SECRETA
+    hash_calculada = hashlib.sha256(verificar_senha.encode("utf-8")).hexdigest()
+    
+    if hash_calculada == resultado[1]:
+        conn.close()
+        return True, "Acesso concedido!", resultado[3]
+    else:
+        conn.close()
+        return False, "Acesso negado!", None

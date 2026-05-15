@@ -74,8 +74,7 @@ def validar_telefone(telefone_digitado):
 
     for erro, mensagem in regras:
         if erro:
-            return False, mensagem
-            
+            return False, mensagem           
     return True, ""
 
 

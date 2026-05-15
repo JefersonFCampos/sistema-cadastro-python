@@ -1,5 +1,7 @@
 import customtkinter as ctk
 from utils import limpar_msg_erro
+from database import confirmar_acesso
+from utils import sincronizar_campo
 
 
 class TelaLogin(ctk.CTkFrame):
@@ -14,31 +16,36 @@ class TelaLogin(ctk.CTkFrame):
             self, text="Acesso Restrito", font=("Roboto", 24, "bold")
         ).pack(pady=30)
 
-        # Campo Usuário
-        self.entry_user = ctk.CTkEntry(
+        # Campo Usuário (email serve com usuario)
+        self.entry_email = ctk.CTkEntry(
             self, width=250, placeholder_text="Usuário"
         )
-        self.entry_user.pack(pady=10)
-        self.entry_user.bind("<Key>", limpar_msg_erro) # Limpa erro ao digitar
+        self.entry_email.pack(pady=10)
+        self.entry_email.bind(
+            "<Key>",
+            lambda event: limpar_msg_erro(self.label_login) # Limpa erro ao digitar
+        ) 
 
         # Campo Senha
         self.entry_senha = ctk.CTkEntry(
             self, width=250, placeholder_text="Senha", show="*"
         )
         self.entry_senha.pack(pady=10)
-        self.entry_senha.bind("<Key>", limpar_msg_erro) # Limpa erro ao digitar
-
-        # --- LABEL DE ERRO (Espaço Reservado) ---
-        self.label_erro = ctk.CTkLabel(
-            self, text="", text_color="#fa5252", font=("Roboto", 12)
+        self.entry_senha.bind(
+            "<Key>",
+            lambda event: limpar_msg_erro(self.label_login) # Limpa erro ao digitar
         )
-        self.label_erro.pack(pady=5)
 
         # Botão Login
         self.btn_login = ctk.CTkButton(
-            self, text="ENTRAR", width=250, command=self.validar_login
+            self, text="ENTRAR", width=250, command=self.processar_login
         )
         self.btn_login.pack(pady=10)
+        self.label_login = ctk.CTkLabel(
+            self, text="", text_color="#fa5252", font=("Roboto", 12)
+        )
+        self.label_login.pack(pady=5)
+
 
         # Botão Cadastrar
         ctk.CTkButton(
@@ -60,17 +67,24 @@ class TelaLogin(ctk.CTkFrame):
             command=lambda: print("Ir para recuperação"),
         ).pack()
 
-    def validar_login(self):
+    def processar_login(self):
         """Lógica de validação simples para teste do layout."""
-        usuario = self.entry_user.get().strip()
-        senha = self.entry_senha.get().strip()
+        email_login = self.entry_email.get().strip()
+        senha_login =self.entry_senha.get().strip()
 
-        if not usuario or not senha:
-            self.label_erro.configure(text="⚠️ Preencha todos os campos!")
-        elif usuario == "admin" and senha == "123":
-            self.label_erro.configure(
-                text_color="#006400", text="Sucesso! Entrando..."
+        if not email_login or not senha_login:
+            self.label_login.configure(
+                text="⚠️ Preencha todos os campos!", text_color="#fa5252"
+            )
+            return
+
+        sucesso, mensagem_banco = confirmar_acesso(email_login, senha_login)                
+
+        if sucesso:
+            self.label_login.configure(
+                text=f"✅ {mensagem_banco}", text_color="#006400"
             )
         else:
-            self.label_erro.configure(text="❌ Usuário ou senha inválidos.")
-            
+            self.label_login.configure(
+                text=f"❌ {mensagem_banco}", text_color="#fa5252"
+            )

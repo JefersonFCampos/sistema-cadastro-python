@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from views.login import TelaLogin
-from views.cadastro import TelaCadastro
+from views.signup import TelaCadastro
 
 
 # Configurações globais de estilo do CustomTkinter
