@@ -6,54 +6,54 @@ import os
 # --- Configuração de Caminho e Ambiente ---
 
 # Define o caminho base como a pasta onde este script está localizado
-pasta_atual = os.path.dirname(__file__)
+current_dir = os.path.dirname(__file__)
 
 # Define e cria a subpasta 'data' para isolar o banco de dados do código-fonte
-pasta_data = os.path.join(pasta_atual, "data")
-if not os.path.exists(pasta_data):
-    os.makedirs(pasta_data)
+data_dir = os.path.join(current_dir, "data")
+if not os.path.exists(data_dir):
+    os.makedirs(data_dir)
 
 # Caminho absoluto final para o banco de dados (garante portabilidade entre sistemas)
-caminho_db = os.path.join(pasta_data, "cadastro.db")
+db_path = os.path.join(data_dir, "singusers.db")
 
-PIMENTA_SECRETA = "MakEstoque_ChaveSecreta_9x8f7g6h5j4k3m2n1p_2026!"
+SECRET_PEPPER = "MakEstoque_ChaveSecreta_9x8f7g6h5j4k3m2n1p_2026!"
 
 # --- Operações de Banco de Dados ---
 
-def conexao_database(nome, email, telefone, senha_pura, cargo):
+def save_user(name, email, phone, password, role):
     """
     Estabelece conexão com o SQLite, garante a tabela com tratamento de restrições
     e realiza a inserção da senha criptografada em formato Hash SHA-256.
     """
-    senha_tempero = secrets.token_hex(8) 
-    senha_temperada = senha_pura + senha_tempero + PIMENTA_SECRETA
-    senha_criptografada = hashlib.sha256(senha_temperada.encode("utf-8")).hexdigest()
+    password_salt = secrets.token_hex(8) 
+    salted_password = password + password_salt + SECRET_PEPPER
+    hashed_password = hashlib.sha256(salted_password.encode("utf-8")).hexdigest()
     
     conn = None
     try:
-        conn = sqlite3.connect(caminho_db)
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
         # Garante que a tabela exista antes da inserção
         cursor.execute(""" 
-            CREATE TABLE IF NOT EXISTS tb_usuarios (
+            CREATE TABLE IF NOT EXISTS tb_users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                V_NOME VARCHAR (30),
+                V_NAME VARCHAR (30),
                 V_EMAIL VARCHAR (30) UNIQUE,
-                C_TELEFONE CHAR (11),
-                V_SENHA VARCHAR (64),
-                V_SAL VARCHAR (16),
-                C_CARGO CHAR (01)
+                C_PHONE CHAR (11),
+                V_PASSWORD_HASH VARCHAR (64),
+                V_SALT VARCHAR (16),
+                C_ROLE CHAR (01)
             ) 
         """)
 
         # Insere os dados validados no banco
         cursor.execute(
             """ 
-            INSERT INTO tb_usuarios (V_NOME, V_EMAIL, C_TELEFONE, V_SENHA, V_SAL, C_CARGO)
+            INSERT INTO tb_users (V_NAME, V_EMAIL, C_PHONE, V_PASSWORD_HASH, V_SALT, C_ROLE)
             VALUES (?, ?, ?, ?, ?, ?) 
             """,
-            (nome, email, telefone, senha_criptografada, senha_tempero, cargo)
+            (name, email, phone, hashed_password, password_salt, role)
         )
 
         conn.commit()
@@ -62,8 +62,8 @@ def conexao_database(nome, email, telefone, senha_pura, cargo):
     except sqlite3.IntegrityError:
         return False, "Erro: Este e-mail já está cadastrado no sistema"
     
-    except sqlite3.Error as erro:
-        return False, f"Erro interno no banco de dados: {erro}"
+    except sqlite3.Error as error:
+        return False, f"Erro interno no banco de dados: {error}"
 
     finally:
         if conn:
@@ -71,33 +71,34 @@ def conexao_database(nome, email, telefone, senha_pura, cargo):
 
 
 
-def confirmar_acesso(email_digitado, senha_digitada):
+def confirm_access(email_input, password_input):
 
-    conn = sqlite3.connect(caminho_db)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
     cursor.execute(
                     """
-                    SELECT V_EMAIL, V_SENHA, V_SAL, C_CARGO
-                    FROM tb_usuarios
+                    SELECT V_EMAIL, V_PASSWORD_HASH, V_SALT, C_ROLE
+                    FROM tb_users
                     WHERE V_EMAIL = ? 
                     
                     """,
-                    (email_digitado,)
+                    (email_input,)
     )
 
-    resultado = cursor.fetchone()
+    result = cursor.fetchone()
 
-    if resultado is None:
+    if result is None:
         conn.close()
         return False, "Usuário não encontrado!", None
 
-    verificar_senha = senha_digitada + resultado[2] + PIMENTA_SECRETA
-    hash_calculada = hashlib.sha256(verificar_senha.encode("utf-8")).hexdigest()
+    check_password = password_input + result[2] + SECRET_PEPPER
+    hash_calculada = hashlib.sha256(check_password.encode("utf-8")).hexdigest()
     
-    if hash_calculada == resultado[1]:
+    if hash_calculada == result[1]:
         conn.close()
-        return True, "Acesso concedido!", resultado[3]
+        return True, "Acesso concedido!", result[3]
     else:
         conn.close()
         return False, "Acesso negado!", None
+    

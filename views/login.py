@@ -1,14 +1,13 @@
 import customtkinter as ctk
-from utils import limpar_msg_erro
-from database import confirmar_acesso
-from utils import sincronizar_campo
+from utils import clean_error_msg
+from database import confirm_access
 
 
-class TelaLogin(ctk.CTkFrame):
+class LoginFrame(ctk.CTkFrame):
         
-    def __init__(self, master, app_controlador):
+    def __init__(self, master, app_controller):
         super().__init__(master, width=320, height=420)               
-        self.app = app_controlador
+        self.app = app_controller
         self.pack_propagate(False)
 
         # Título
@@ -17,34 +16,34 @@ class TelaLogin(ctk.CTkFrame):
         ).pack(pady=30)
 
         # Campo Usuário (email serve com usuario)
-        self.entry_email = ctk.CTkEntry(
+        self.email_entry = ctk.CTkEntry(
             self, width=250, placeholder_text="Usuário"
         )
-        self.entry_email.pack(pady=10)
-        self.entry_email.bind(
+        self.email_entry.pack(pady=10)
+        self.email_entry.bind(
             "<Key>",
-            lambda event: limpar_msg_erro(self.label_login) # Limpa erro ao digitar
+            lambda event: clean_error_msg(self.login_status_label) # Limpa erro ao digitar
         ) 
 
         # Campo Senha
-        self.entry_senha = ctk.CTkEntry(
+        self.password_entry = ctk.CTkEntry(
             self, width=250, placeholder_text="Senha", show="*"
         )
-        self.entry_senha.pack(pady=10)
-        self.entry_senha.bind(
+        self.password_entry.pack(pady=10)
+        self.password_entry.bind(
             "<Key>",
-            lambda event: limpar_msg_erro(self.label_login) # Limpa erro ao digitar
+            lambda event: clean_error_msg(self.login_status_label) # Limpa erro ao digitar
         )
 
         # Botão Login
-        self.btn_login = ctk.CTkButton(
-            self, text="ENTRAR", width=250, command=self.processar_login
+        self.login_button = ctk.CTkButton(
+            self, text="ENTRAR", width=250, command=self.process_login
         )
-        self.btn_login.pack(pady=10)
-        self.label_login = ctk.CTkLabel(
+        self.login_button.pack(pady=10)
+        self.login_status_label = ctk.CTkLabel(
             self, text="", text_color="#fa5252", font=("Roboto", 12)
         )
-        self.label_login.pack(pady=5)
+        self.login_status_label.pack(pady=5)
 
 
         # Botão Cadastrar
@@ -67,24 +66,24 @@ class TelaLogin(ctk.CTkFrame):
             command=lambda: print("Ir para recuperação"),
         ).pack()
 
-    def processar_login(self):
+    def process_login(self):
         """Lógica de validação simples para teste do layout."""
-        email_login = self.entry_email.get().strip()
-        senha_login =self.entry_senha.get().strip()
+        email_input = self.email_entry.get().strip()
+        password_input =self.password_entry.get().strip()
 
-        if not email_login or not senha_login:
-            self.label_login.configure(
+        if not email_input or not password_input:
+            self.login_status_label.configure(
                 text="⚠️ Preencha todos os campos!", text_color="#fa5252"
             )
             return
 
-        sucesso, mensagem_banco = confirmar_acesso(email_login, senha_login)                
+        success, db_message, user_role = confirm_access(email_input, password_input)                
 
-        if sucesso:
-            self.label_login.configure(
-                text=f"✅ {mensagem_banco}", text_color="#006400"
+        if success:
+            self.login_status_label.configure(
+                text=f"✅ {db_message}", text_color="#006400"
             )
         else:
-            self.label_login.configure(
-                text=f"❌ {mensagem_banco}", text_color="#fa5252"
+            self.login_status_label.configure(
+                text=f"❌ {db_message}", text_color="#fa5252"
             )
