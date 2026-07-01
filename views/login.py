@@ -78,7 +78,7 @@ class TelaLogin(ctk.CTkFrame):
             )
             return
 
-        sucesso, mensagem_banco = confirmar_acesso(email_login, senha_login)                
+        sucesso, mensagem_banco, cargo_cod = confirmar_acesso(email_login, senha_login)                
 
         if sucesso:
             self.label_login.configure(
