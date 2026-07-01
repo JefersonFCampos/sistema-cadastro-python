@@ -1,6 +1,6 @@
 import customtkinter as ctk
-from views.login import TelaLogin
-from views.signup import TelaCadastro
+from views.login import LoginFrame
+from views.signup import SignUpFrame
 
 
 # Configurações globais de estilo do CustomTkinter
@@ -19,25 +19,28 @@ class App(ctk.CTk):
         self.container = ctk.CTkFrame(self)
         self.container.pack(expand=True, fill="both")
 
-        self.mostrar_tela_login()
+        self.show_login_frame()
 
-    def limpar_tela(self):
+    def clean_screen(self):
         """Remove todos os widgets do container principal."""
         for widget in self.container.winfo_children():
             widget.destroy()
 
-    def mostrar_tela_login(self):
-        self.limpar_tela()
+    def show_login_frame(self):
+        self.clean_screen()
 
-        self.tela_atual = TelaLogin(self.container, self)
-        self.tela_atual.place(relx=0.5, rely=0.5, anchor="center")
+        self.current_frame = LoginFrame(self.container, self)
+        self.current_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-    def mostrar_tela_cadastro(self):
-        self.limpar_tela()
+    def show_signup_frame(self):
+        self.clean_screen()
 
-        self.tela_atual = TelaCadastro(self.container, self)
-        self.tela_atual.place(relx=0.5, rely=0.5, anchor="center")
+        self.current_frame = SignUpFrame(self.container, self)
+        self.current_frame.place(relx=0.5, rely=0.5, anchor="center")
     
+    def show_dashboard_frame(self):
+        pass
+
 
 if __name__ == "__main__":
     app = App()

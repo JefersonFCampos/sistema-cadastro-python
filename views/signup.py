@@ -1,19 +1,19 @@
 import customtkinter as ctk
-from utils import sincronizar_campo, limpar_msg_erro, salvar_database
+from utils import sync_field, clean_error_msg, save_user_data
 from validations import (
-    validar_email,
-    validar_nome,
-    validar_senha,
-    validar_telefone,
-    validar_confirmacao_senha,
+    validate_name,
+    validate_email,
+    validate_phone,
+    validate_password,
+    confirm_password_match,
 )
 
 
-class TelaCadastro(ctk.CTkFrame):
+class SignUpFrame(ctk.CTkFrame):
         
-    def __init__(self, master, app_controlador):
+    def __init__(self, master, app_controller):
         super().__init__(master, width=350, height=560)
-        self.app = app_controlador
+        self.app = app_controller
         self.pack_propagate(False)    
 
         # Título
@@ -22,186 +22,186 @@ class TelaCadastro(ctk.CTkFrame):
         ).pack(pady=(15, 10))
 
         # Campo Nome
-        self.entry_cad_nome = ctk.CTkEntry(
+        self.name_entry = ctk.CTkEntry(
             self, width=280, placeholder_text="Nome Completo"
         )
-        self.entry_cad_nome.pack(pady=(5, 0))
-        self.label_erro_nome = ctk.CTkLabel(
+        self.name_entry.pack(pady=(5, 0))
+        self.name_error_label = ctk.CTkLabel(
             self, text="", text_color="#fa5252"
         )
-        self.label_erro_nome.pack()
-        self.entry_cad_nome.bind(
+        self.name_error_label.pack()
+        self.name_entry.bind(
             "<KeyRelease>",
             lambda event: [
-                sincronizar_campo(
-                    self.entry_cad_nome, self.label_erro_nome, validar_nome
+                sync_field(
+                    self.name_entry, self.name_error_label, validate_name
                 ),
-                limpar_msg_erro(self.label_commit_cad)
+                clean_error_msg(self.submit_status_label)
             ]
         )
 
         # Campo E-mail
-        self.entry_cad_email = ctk.CTkEntry(
+        self.email_entry = ctk.CTkEntry(
             self, width=280, placeholder_text="E-mail"
         )
-        self.entry_cad_email.pack(pady=(5, 0))
-        self.label_erro_email = ctk.CTkLabel(
+        self.email_entry.pack(pady=(5, 0))
+        self.email_error_label = ctk.CTkLabel(
             self, text="", text_color="#fa5252"
         )
-        self.label_erro_email.pack(pady=(0, 2))
-        self.entry_cad_email.bind(
+        self.email_error_label.pack(pady=(0, 2))
+        self.email_entry.bind(
             "<KeyRelease>",
             lambda event: [
-                sincronizar_campo(
-                    self.entry_cad_email, self.label_erro_email, validar_email
+                sync_field(
+                    self.email_entry, self.email_error_label, validate_email
                 ),
-                limpar_msg_erro(self.label_commit_cad)
+                clean_error_msg(self.submit_status_label)
             ]
         )
 
         # --- Campo Telefone Unificado com Máscara em Tempo Real ---
-        self.entry_cad_telefone = ctk.CTkEntry(
+        self.phone_entry = ctk.CTkEntry(
             self, width=280, placeholder_text="Telefone Ex: (51) 99999-9999"
         )
-        self.entry_cad_telefone.pack(pady=(10, 0))
+        self.phone_entry.pack(pady=(10, 0))
         
-        self.label_erro_telefone = ctk.CTkLabel(
+        self.phone_error_label = ctk.CTkLabel(
             self, text="", text_color="red", font=("Roboto", 12)
         )
-        self.label_erro_telefone.pack()
+        self.phone_error_label.pack()
         
         # O Gatilho dispara a máscara PRIMEIRO e a validação logo em seguida
-        self.entry_cad_telefone.bind(
+        self.phone_entry.bind(
             "<KeyRelease>",
             lambda event: [
-                self.aplicar_mascara_telefone(event), # <--- Aplica o visual da máscara
-                sincronizar_campo(
-                    self.entry_cad_telefone, self.label_erro_telefone,validar_telefone
+                self.apply_phone_mask(event), # <--- Aplica o visual da máscara
+                sync_field(
+                    self.phone_entry, self.phone_error_label,validate_phone
                 ),
-                limpar_msg_erro(self.label_commit_cad)
+                clean_error_msg(self.submit_status_label)
             ]
         )
 
         # Campo Senha
-        self.entry_cad_senha = ctk.CTkEntry(
+        self.password_entry = ctk.CTkEntry(
             self, width=280, placeholder_text="Criar Senha", show="*"
         )
-        self.entry_cad_senha.pack(pady=(10, 0))
-        self.label_erro_senha = ctk.CTkLabel(
+        self.password_entry.pack(pady=(10, 0))
+        self.password_error_label = ctk.CTkLabel(
             self, text="", text_color="#fa5252"
         )
-        self.label_erro_senha.pack()
+        self.password_error_label.pack()
 
-        # Campo Repetir Senha
-        self.entry_repetir_senha = ctk.CTkEntry(
+        # Campo Confirmar Senha
+        self.confirm_password_entry = ctk.CTkEntry(
             self, width=280, placeholder_text="Repetir Senha", show="*"
         )
-        self.entry_repetir_senha.pack(pady=(10, 0))
-        self.label_erro_repetir = ctk.CTkLabel(
+        self.confirm_password_entry.pack(pady=(10, 0))
+        self.confirm_password_error_label = ctk.CTkLabel(
             self, text="", text_color="#fa5252"
         )
-        self.label_erro_repetir.pack()
+        self.confirm_password_error_label.pack()
 
         # Eventos vinculados à Senha 1
-        self.entry_cad_senha.bind(
+        self.password_entry.bind(
             "<KeyRelease>",
             lambda event: [
-                sincronizar_campo(
-                    self.entry_cad_senha, self.label_erro_senha, validar_senha
+                sync_field(
+                    self.password_entry, self.password_error_label, validate_password
                 ),
-                sincronizar_campo(
-                    self.entry_repetir_senha,
-                    self.label_erro_repetir,
-                    lambda valor: validar_confirmacao_senha(
-                        self.entry_cad_senha.get(), valor
+                sync_field(
+                    self.confirm_password_entry,
+                    self.confirm_password_error_label,
+                    lambda valor: confirm_password_match(
+                        self.password_entry.get(), valor
                     )
                 ),
-                limpar_msg_erro(self.label_commit_cad)
+                clean_error_msg(self.submit_status_label)
             ]
         )
 
         # Eventos vinculados à Senha 2
-        self.entry_repetir_senha.bind(
+        self.confirm_password_entry.bind(
             "<KeyRelease>",
             lambda event: [
-                sincronizar_campo(
-                    self.entry_repetir_senha,
-                    self.label_erro_repetir,
-                    lambda valor: validar_confirmacao_senha(
-                        self.entry_cad_senha.get(), valor
+                sync_field(
+                    self.confirm_password_entry,
+                    self.confirm_password_error_label,
+                    lambda valor: confirm_password_match(
+                        self.password_entry.get(), valor
                     )
                 ),
-                limpar_msg_erro(self.label_commit_cad)
+                clean_error_msg(self.submit_status_label)
             ]
         )
 
         # Menu de Seleção de Nível
-        self.option_cargo = ctk.CTkOptionMenu(
+        self.role_option_menu = ctk.CTkOptionMenu(
             self, width=280, values=["Funcionário", "Administrador"]
         )
-        self.option_cargo.pack(pady=(10, 0))
-        self.option_cargo.set("Funcionário") # Valor padrão
+        self.role_option_menu.pack(pady=(10, 0))
+        self.role_option_menu.set("Funcionário") # Valor padrão
 
         # Label de commit para Cadastro
-        self.label_commit_cad = ctk.CTkLabel(
+        self.submit_status_label = ctk.CTkLabel(
             self, text="", text_color="#fa5252", font=("Roboto", 12)
         )
-        self.label_commit_cad.pack(pady=5)
+        self.submit_status_label.pack(pady=5)
 
         # Botão Cadastrar
-        self.btn_confirmar_cad = ctk.CTkButton(
+        self.submit_button = ctk.CTkButton(
             self,
             text="FINALIZAR CADASTRO",
             width=280,
             fg_color="#007700",
             hover_color="#006400",
-            command=lambda: salvar_database(self)
+            command=lambda: save_user_data(self)
         )
-        self.btn_confirmar_cad.pack(pady=10)
+        self.submit_button.pack(pady=10)
 
         # Botão Voltar
         ctk.CTkButton(
             self,
             text="Voltar ao Login",
             fg_color="transparent",
-            command=lambda: self.app.mostrar_tela_login()
+            command=lambda: self.app.show_login_frame()
         ).pack(pady=(5))
 
     # --- Lógica de Sincronização ---
 
-    def aplicar_mascara_telefone(self, event):
+    def apply_phone_mask(self, event):
         """Aplica a máscara (XX) XXXXX-XXXX em tempo real no campo de telefone."""
         # Ignora teclas de controle como Backspace, Delete ou Setas para não quebrar a digitação
         if event.keysym in ("Backspace", "Delete", "Left", "Right", "Tab"):
             return
 
         # 1. Pega o texto atual e remove tudo o que não for número
-        texto_puro = "".join(filter(str.isdigit, self.entry_cad_telefone.get()))
+        raw_text = "".join(filter(str.isdigit, self.phone_entry.get()))
         
         # Limita o máximo absoluto a 11 dígitos numéricos
-        texto_puro = texto_puro[:11]
-        texto_formatado = ""
+        raw_text = raw_text[:11]
+        formatted_text = ""
 
         # 2. Constrói a máscara dinamicamente com base no tamanho do texto puro
-        tamanho = len(texto_puro)
+        text_length = len(raw_text)
         
-        if tamanho > 0:
+        if text_length > 0:
             # Se digitou pelo menos o início do DDD
-            if tamanho <= 2:
-                texto_formatado = f"({texto_puro}"
+            if text_length <= 2:
+                formatted_text = f"({raw_text}"
             # Se já digitou o DDD completo
-            elif tamanho <= 7:
-                texto_formatado = f"({texto_puro[:2]}) {texto_puro[2:]}"
+            elif text_length <= 7:
+                formatted_text = f"({raw_text[:2]}) {raw_text[2:]}"
             # Se chegou no formato completo com o hífen deslocado para o final
             else:
-                texto_formatado = f"({texto_puro[:2]}) {texto_puro[2:7]}-{texto_puro[7:]}"
+                formatted_text = f"({raw_text[:2]}) {raw_text[2:7]}-{raw_text[7:]}"
 
         # 3. Atualiza o campo na tela com o texto mascarado
         # Guarda a posição atual do cursor para o usuário não perder o foco
-        posicao_cursor = self.entry_cad_telefone._entry.index("insert")
+        cursor_position = self.phone_entry._entry.index("insert")
         
-        self.entry_cad_telefone.delete(0, "end")
-        self.entry_cad_telefone.insert(0, texto_formatado)
+        self.phone_entry.delete(0, "end")
+        self.phone_entry.insert(0, formatted_text)
         
         # Reposiciona o cursor de digitação de forma inteligente no final
-        self.entry_cad_telefone._entry.icursor(posicao_cursor + 1 if event.char else "end")
+        self.phone_entry._entry.icursor(cursor_position + 1 if event.char else "end")

@@ -6,12 +6,12 @@ integridade dos dados inseridos no sistema utilizando Table-Driven Validation.
 """
 
 # --- Constantes de Configuração de Limites (Regras de Negócio) ---
-NOME_MIN_CARACTERES = 3
-NOME_MAX_CARACTERES = 50
-SENHA_MIN_CARACTERES = 6
-EMAIL_MAX_CARACTERES = 60
-TELEFONE_REQUISITO_DIGITOS = 11
-DDDS_VALIDOS = (
+MIN_NAME_LENGTH = 3
+MAX_NAME_LENGTH = 50
+MIN_PASSWORD_LENGTH = 6
+MAX_EMAIL_LENGTH = 60
+PHONE_DIGIT_REQUIREMENT = 11
+VALID_DDDS = (
     # Região 1 (SP)
     "11", "12", "13", "14", "15", "16", "17", "18", "19",
     # Região 2 (RJ/ES)
@@ -33,102 +33,102 @@ DDDS_VALIDOS = (
 )
 
 
-def validar_nome(nome_digitado):
+def validate_name(name_input):
     """Valida o nome utilizando uma lista de regras."""
-    conteudo_limpo = nome_digitado.strip()
+    clean_content = name_input.strip()
 
-    regras = [
-        (not conteudo_limpo, "Nome não pode estar vazio."),
-        (len(conteudo_limpo) < NOME_MIN_CARACTERES, "Nome muito curto."),
+    rules = [
+        (not clean_content, "Nome não pode estar vazio."),
+        (len(clean_content) < MIN_NAME_LENGTH, "Nome muito curto."),
         (
-            not conteudo_limpo.replace(" ", "").isalpha(),
+            not clean_content.replace(" ", "").isalpha(),
             "Nome deve conter apenas letras.",
         ),
-        (len(conteudo_limpo) > NOME_MAX_CARACTERES, "Nome muito longo."),
+        (len(clean_content) > MAX_NAME_LENGTH, "Nome muito longo."),
     ]
 
-    for erro, mensagem in regras:
-        if erro:
-            return False, mensagem
+    for error, message in rules:
+        if error:
+            return False, message
     return True, ""
 
 
-def validar_telefone(telefone_digitado):
+def validate_phone(phone_input):
     """Valida o telefone completo removendo a máscara visual antes do teste."""
     # Remove os parênteses, hifens e espaços para validar apenas os 11 números puros
-    conteudo_limpo = "".join(filter(str.isdigit, telefone_digitado))
+    clean_content = "".join(filter(str.isdigit, phone_input))
     
-    ddd_extraido = conteudo_limpo[:2] if len(conteudo_limpo) >= 2 else ""
+    extracted_ddd = clean_content[:2] if len(clean_content) >= 2 else ""
 
-    regras = [
-        (not conteudo_limpo, "Telefone não pode estar vazio."),
+    rules = [
+        (not clean_content, "Telefone não pode estar vazio."),
         (
-            len(conteudo_limpo) != TELEFONE_REQUISITO_DIGITOS, 
-            f"O telefone deve conter exatamente {TELEFONE_REQUISITO_DIGITOS} dígitos numéricos."
+            len(clean_content) != PHONE_DIGIT_REQUIREMENT, 
+            f"O telefone deve conter exatamente {PHONE_DIGIT_REQUIREMENT} dígitos numéricos."
         ),
         (
-            ddd_extraido not in DDDS_VALIDOS, 
+            extracted_ddd not in VALID_DDDS, 
             "DDD inválido ou inexistente no Brasil."
         )
     ]
 
-    for erro, mensagem in regras:
-        if erro:
-            return False, mensagem           
+    for error, message in rules:
+        if error:
+            return False, message           
     return True, ""
 
 
-def validar_email(email_digitado):
+def validate_email(email_input):
     """Valida o e-mail utilizando uma lista de regras."""
-    conteudo_limpo = email_digitado.strip()
+    clean_content = email_input.strip()
     pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.(com|com\.br|net|org)$"
 
-    regras = [
-        (len(conteudo_limpo) == 0, "O e-mail não pode estar vazio."),
-        (" " in email_digitado, "O e-mail não pode conter espaços."),
+    rules = [
+        (len(clean_content) == 0, "O e-mail não pode estar vazio."),
+        (" " in email_input, "O e-mail não pode conter espaços."),
         (
-            len(conteudo_limpo) > EMAIL_MAX_CARACTERES, f"O e-mail deve ter no máximo {EMAIL_MAX_CARACTERES} caracteres."
+            len(clean_content) > MAX_EMAIL_LENGTH, f"O e-mail deve ter no máximo {MAX_EMAIL_LENGTH} caracteres."
         ),
         (
-            not re.match(pattern, conteudo_limpo), "E-mail inválido. Ex: abc@gmail.com"
+            not re.match(pattern, clean_content), "E-mail inválido. Ex: abc@gmail.com"
         )
     ]
 
-    for erro, mensagem in regras:
-        if erro:
-            return False, mensagem
+    for error, message in rules:
+        if error:
+            return False, message
     return True, ""
 
 
-def validar_senha(senha_digitada):
+def validate_password(password_input):
     """Valida se a senha atende aos requisitos mínimos de segurança."""
-    regras = [
-        (not senha_digitada.strip(), "A senha não pode estar vazia."),
-        (" " in senha_digitada, "A senha não pode conter espaços."),
+    rules = [
+        (not password_input.strip(), "A senha não pode estar vazia."),
+        (" " in password_input, "A senha não pode conter espaços."),
         (
-            len(senha_digitada) < SENHA_MIN_CARACTERES, f"Mínimo de {SENHA_MIN_CARACTERES} caracteres."
+            len(password_input) < MIN_PASSWORD_LENGTH, f"Mínimo de {MIN_PASSWORD_LENGTH} caracteres."
         ),
         (
-            senha_digitada in ["123456", "654321", "admin123"],
+            password_input in ["123456", "654321", "admin123"],
             "A senha é muito óbvia.",
         ),
         (
-            senha_digitada.isdigit() and senha_digitada in "1234567890",
+            password_input.isdigit() and password_input in "1234567890",
             "Não use sequências simples.",
         ),
     ]
 
-    for erro, mensagem in regras:
-        if erro:
-            return False, mensagem
+    for error, message in rules:
+        if error:
+            return False, message
     return True, ""
 
 
-def validar_confirmacao_senha(senha_original, senha_repetida):
+def confirm_password_match(original_password, repeated_password):
     """Verifica se a segunda senha é exatamente igual à primeira."""
-    if not senha_repetida:
+    if not repeated_password:
         return False, ""
 
-    if senha_original != senha_repetida:
+    if original_password != repeated_password:
         return False, "As senhas não coincidem."
     return True, ""
