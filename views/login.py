@@ -83,7 +83,10 @@ class LoginFrame(ctk.CTkFrame):
             self.login_status_label.configure(
                 text=f"✅ {db_message}", text_color="#006400"
             )
+            # Aguarda meio segundo para o usuário ver o feedback visual de sucesso e muda de tela
+            self.after(500, lambda: self.app.show_dashboard_frame(role_code=rule_cod))
         else:
             self.login_status_label.configure(
                 text=f"❌ {db_message}", text_color="#fa5252"
             )
+

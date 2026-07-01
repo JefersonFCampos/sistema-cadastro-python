@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from views.login import LoginFrame
 from views.signup import SignUpFrame
-
+from views.dashboard import DashboardFrame
 
 # Configurações globais de estilo do CustomTkinter
 ctk.set_appearance_mode("System")
@@ -38,8 +38,13 @@ class App(ctk.CTk):
         self.current_frame = SignUpFrame(self.container, self)
         self.current_frame.place(relx=0.5, rely=0.5, anchor="center")
     
-    def show_dashboard_frame(self):
-        pass
+    def show_dashboard_frame(self, role_code):
+        self.clean_screen()
+
+        # Instancia o Dashboard expandido por toda a janela gráfica
+        self.current_frame = DashboardFrame(self.container, self, role_code=role_code)
+        self.current_frame.pack(expand=True, fill="both")
+
 
 
 if __name__ == "__main__":

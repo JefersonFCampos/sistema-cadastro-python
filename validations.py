@@ -5,7 +5,15 @@ Módulo de Validações: Contém a lógica de negócio para verificação de
 integridade dos dados inseridos no sistema utilizando Table-Driven Validation.
 """
 
-# --- Constantes de Configuração de Limites (Regras de Negócio) ---
+# =====================================================================
+# REGRAS DE NEGÓCIO
+# =====================================================================
+
+# --- Constantes de Configuração para o Estoque ---
+MIN_PRODUCT_NAME_LENGTH = 2
+
+
+# --- Constantes de Configuração para o Cadastro ---
 MIN_NAME_LENGTH = 3
 MAX_NAME_LENGTH = 50
 MIN_PASSWORD_LENGTH = 6
@@ -131,4 +139,51 @@ def confirm_password_match(original_password, repeated_password):
 
     if original_password != repeated_password:
         return False, "As senhas não coincidem."
+    return True, ""
+
+def validate_product_name(name_input):
+    """Valida o nome do produto utilizando uma lista de regras."""
+    clean_content = name_input.strip()
+
+    rules = [
+        (not clean_content, "O nome do produto não pode estar vazio."),
+        (len(clean_content) < MIN_PRODUCT_NAME_LENGTH, f"Nome do produto muito curto (mínimo {MIN_PRODUCT_NAME_LENGTH} letras).")
+    ]
+
+    for error, message in rules:
+        if error:
+            return False, message
+    return True, ""
+
+
+def validate_product_values(qty_input, cost_input, price_input, is_admin=True):
+    """Valida se as strings numéricas fornecidas pela interface são válidas e lógicas."""
+    # 1. Validar Quantidade
+    try:
+        qty = int(qty_input.strip())
+        if qty < 0:
+            return False, "A quantidade inicial não pode ser negativa."
+    except ValueError:
+        return False, "Quantidade deve ser um número inteiro válido."
+
+    # 2. Validar Preço de Custo (apenas se for administrador)
+    custo_final = 0.0
+    if is_admin and cost_input:
+        try:
+            custo_final = float(cost_input.strip().replace(",", "."))
+            if custo_final <= 0:
+                return False, "O preço de custo deve ser maior que zero."
+        except ValueError:
+            return False, "Preço de custo inválido (use pontos ou vírgulas)."
+
+    # 3. Validar Preço de Venda
+    try:
+        price = float(price_input.strip().replace(",", "."))
+        if price <= 0:
+            return False, "O preço de venda deve ser maior que zero."
+        if is_admin and price < custo_final:
+            return False, "⚠️ Alerta: Preço de venda menor que o custo (Prejuízo!)."
+    except ValueError:
+        return False, "Preço de venda inválido (use pontos ou vírgulas)."
+
     return True, ""
