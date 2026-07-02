@@ -15,7 +15,7 @@ class LoginFrame(ctk.CTkFrame):
             self, text="Acesso Restrito", font=("Roboto", 24, "bold")
         ).pack(pady=30)
 
-        # Campo Usuário (email serve com usuario)
+        # Campo Usuário (email serve como usuário)
         self.email_entry = ctk.CTkEntry(
             self, width=250, placeholder_text="Usuário"
         )
@@ -77,16 +77,15 @@ class LoginFrame(ctk.CTkFrame):
             )
             return
 
-        success, db_message, rule_cod = confirm_access(email_input, password_input)                
+        success, db_message, role = confirm_access(email_input, password_input)                
 
         if success:
             self.login_status_label.configure(
                 text=f"✅ {db_message}", text_color="#006400"
             )
             # Aguarda meio segundo para o usuário ver o feedback visual de sucesso e muda de tela
-            self.after(500, lambda: self.app.show_dashboard_frame(role_code=rule_cod))
+            self.after(500, lambda: self.app.show_dashboard_frame(role_code=role))
         else:
             self.login_status_label.configure(
                 text=f"❌ {db_message}", text_color="#fa5252"
             )
-

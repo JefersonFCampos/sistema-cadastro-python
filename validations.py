@@ -141,6 +141,7 @@ def confirm_password_match(original_password, repeated_password):
         return False, "As senhas não coincidem."
     return True, ""
 
+
 def validate_product_name(name_input):
     """Valida o nome do produto utilizando uma lista de regras."""
     clean_content = name_input.strip()

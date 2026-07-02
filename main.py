@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from views.login import LoginFrame
 from views.signup import SignUpFrame
-from views.dashboard import DashboardFrame
+from views.main_dashboard import DashboardFrame
 
 # Configurações globais de estilo do CustomTkinter
 ctk.set_appearance_mode("System")
