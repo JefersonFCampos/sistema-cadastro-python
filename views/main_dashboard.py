@@ -124,23 +124,5 @@ class DashboardFrame(ctk.CTkFrame):
         self.clean_content_area()
         self.highlight_active_button(self.btn_stock)
 
-        # Importa e aninha a tela neta dedicada ao estoque dentro do frame de conteúdo
-        from views.dashboard.stock_view import StockManagementFrame
-        self.current_subview = StockManagementFrame(self.content_frame, self.stock_controller, self.user_role, self)
-        self.current_subview.pack(fill="both", expand=True)
+        self.stock_controller.load_stock_screen(self.content_frame)
 
-
-    def open_add_product_modal(self):
-        """Abre uma janela flutuante para cadastro do novo item."""
-        AddProductModal(self, self.stock_controller, self.user_role)
-
-
-    def quick_add_stock(self, product_item):
-        """Aumenta a quantidade do item diretamente na memória e re-renderiza a tabela."""
-        product_item["qty"] += 10
-        self.render_products_table()
-
-
-    def edit_product(self, product_name):
-        """Simula a abertura da tela de edição do item selecionado."""
-        print(f"✏️ [EDITAR] Abrindo formulário de edição para o produto: '{product_name}'")

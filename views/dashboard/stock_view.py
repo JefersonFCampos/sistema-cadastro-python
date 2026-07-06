@@ -27,6 +27,7 @@ class StockManagementFrame(ctk.CTkFrame):
             tools_frame, placeholder_text="🔍 Comece a digitar o nome do produto para filtrar...", width=450
         )
         self.search_entry.pack(side="left", padx=(0, 10))
+        self.search_entry.bind("<KeyRelease>", lambda event: self.render_products_table())
 
         # Botão de Ação chamativo (Chama o controlador externo direto)
         self.add_product_button = ctk.CTkButton(
@@ -64,7 +65,8 @@ class StockManagementFrame(ctk.CTkFrame):
         ctk.CTkLabel(table_header, text="Ações", font=("Roboto", 12, "bold"), width=80, anchor="center").pack(side="right", padx=10, pady=5)
 
         # Coleta a lista de dados protegida dentro do controlador
-        for item in self.controller.get_products():
+        search_text = self.search_entry.get()
+        for item in self.controller.get_filtered_products(search_text):
             row_frame = ctk.CTkFrame(self.table_scroll, fg_color="transparent")
             row_frame.pack(fill="x", pady=4)
 
@@ -82,7 +84,7 @@ class StockManagementFrame(ctk.CTkFrame):
             actions_frame.pack(side="right", padx=10)
 
             # O botão de editar aponta para uma função vazia por enquanto para não quebrar
-            ctk.CTkButton(actions_frame, text="✏️", width=30, height=25, fg_color="transparent", hover=False).pack(side="left", padx=2)
+            ctk.CTkButton(actions_frame, text="✏️", width=30, height=25, fg_color="transparent", hover=False, command=lambda i=item: self.controller.open_edit_product_modal(i)).pack(side="left", padx=2)
             
             # O botão de entrada rápida chama o controlador passando a si mesma (View) para poder atualizar depois
             ctk.CTkButton(actions_frame, text="➕", width=30, height=25, fg_color="transparent", hover=False, command=lambda i=item: self.controller.add_quick_stock(i, self)).pack(side="left", padx=2)
